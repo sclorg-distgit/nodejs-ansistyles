@@ -8,13 +8,19 @@
 
 Name:           %{?scl_prefix}nodejs-ansistyles
 Version:        0.1.3
-Release:        1%{?dist}
+Release:        4%{?dist}
 Summary:        Functions that surround a string with ansistyle codes so it prints in style.
 Url:            https://github.com/thlorenz/ansistyles
-Source0:        http://registry.npmjs.org/ansistyles/-/ansistyles-0.1.3.tgz
+Source0:        http://registry.npmjs.org/ansistyles/-/ansistyles-%{version}.tgz
 License:        MIT
 
-BuildRoot:      %{_tmppath}/%{pkg_name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildArch:      noarch
+
+%if 0%{?fedora} >= 19
+ExclusiveArch:  %{nodejs_arches} noarch
+%else
+ExclusiveArch:  %{ix86} x86_64 %{arm} noarch
+%endif
 
 BuildRequires:  %{?scl_prefix}nodejs-devel
 
@@ -28,24 +34,24 @@ Functions that surround a string with ansistyle codes so it prints in style.
 #nothing to do
 
 %install
-rm -rf %buildroot
-
 mkdir -p %{buildroot}%{nodejs_sitelib}/ansistyles
 cp -pr package.json ansistyles.js %{buildroot}%{nodejs_sitelib}/ansistyles
 %nodejs_symlink_deps
+
 %check
 %{?scl:scl enable %{scl} "}
 node test/ansistyles.js
 %{?scl:"}
-%clean
-rm -rf %buildroot
 
 %files
-%defattr(-,root,root,-)
 %{nodejs_sitelib}/ansistyles
-
 %doc LICENSE README.md
 
 %changelog
+* Thu Feb 18 2016 Zuzana Svetlikova <zsvetlik@redhat.com> - 0.1.3-4
+- Add missing ExclusiveArch and BuildArch
+- Use macro in -runtime dependency
+- Rebuilt with updated metapackage
+
 * Thu Jan 30 2014 Tomas Hrcka <thrcka@redhat.com> - 0.1.3-1
 - Initial build 
